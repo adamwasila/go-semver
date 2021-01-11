@@ -54,7 +54,7 @@ func MustParse(semver string) Version {
 // Numbers must not have leading zeros.
 func SetCore(core string) func(*Version) error {
 	return func(s *Version) error {
-		if len(core) == 0 {
+		if core == "" {
 			return nil
 		}
 		parser := sequence(
@@ -85,7 +85,7 @@ func SetCore(core string) func(*Version) error {
 // `a.b.c`, `rc.1`, `rc01`, `alpha.beta.gamma` etc.
 func Prerelease(pr string) func(*Version) error {
 	return func(s *Version) error {
-		if len(pr) == 0 {
+		if pr == "" {
 			return nil
 		}
 		parser := sequence(prerelease(), repeat(dot(), prerelease()), excess())
@@ -101,7 +101,7 @@ func Prerelease(pr string) func(*Version) error {
 // * dot separated, nonempty components of [a-zA-Z0-9-] alphabet.
 func BuildMetadata(bl string) func(*Version) error {
 	return func(s *Version) error {
-		if len(bl) == 0 {
+		if bl == "" {
 			return nil
 		}
 		parser := sequence(buildmetadata(), repeat(dot(), buildmetadata()), excess())
@@ -171,7 +171,7 @@ func implementationChange() BumpOption {
 }
 
 // Bump changes version to newer using provided list of bump options
-func (s Version) Bump(options ...BumpOption) (Version, error) {
+func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
 		options = []BumpOption{
 			BreakingChange,
@@ -179,7 +179,7 @@ func (s Version) Bump(options ...BumpOption) (Version, error) {
 		}
 	}
 
-	newSemver := s
+	newSemver := *semver
 	newSemver.Buildmetadata = []string{}
 
 	var err error
@@ -193,7 +193,7 @@ func (s Version) Bump(options ...BumpOption) (Version, error) {
 }
 
 // MustBump works like Bump but panics in cases where Bump returns an error
-func (semver Version) MustBump(options ...BumpOption) Version {
+func (semver *Version) MustBump(options ...BumpOption) Version {
 	nv, err := semver.Bump(options...)
 	if err != nil {
 		panic(err)
@@ -201,7 +201,7 @@ func (semver Version) MustBump(options ...BumpOption) Version {
 	return nv
 }
 
-// Valid performs regular parse and returns whetever it was succesful or not bug discarding actual result
+// Valid performs regular parse and returns whetever it was successful or not bug discarding actual result
 func Valid(semver string) bool {
 	_, err := Parse(semver)
 	return err == nil
@@ -209,7 +209,7 @@ func Valid(semver string) bool {
 
 // Valid checks if version struct follows semver rules. Instances created by New must always be valid.
 // Purpose of this method is to check directly created or modified structs.
-func (semver Version) Valid() bool {
+func (semver *Version) Valid() bool {
 	_, err := Parse(semver.String())
 	return err == nil
 }
@@ -238,7 +238,7 @@ func Less(s1, s2 *Version) bool {
 	return false
 }
 
-func lessOrEqual(a, b string) (bool, bool) {
+func lessOrEqual(a, b string) (less, eq bool) {
 	if len(a) > len(b) {
 		return false, false
 	}
@@ -248,7 +248,7 @@ func lessOrEqual(a, b string) (bool, bool) {
 	return a < b, a == b
 }
 
-func lessOrEqualStrings(a, b []string) (bool, bool) {
+func lessOrEqualStrings(a, b []string) (less, eq bool) {
 	if len(a) == 0 && len(b) == 0 {
 		return false, true
 	}
@@ -287,7 +287,7 @@ func lessOrEqualStrings(a, b []string) (bool, bool) {
 	return false, true
 }
 
-func isNum(s string) (bool, int) {
+func isNum(s string) (num bool, val int) {
 	val, err := strconv.Atoi(s)
 	return err == nil, val
 }
@@ -299,8 +299,8 @@ func min(a, b int) int {
 	return b
 }
 
-// String perfectly reverses Parse/MustParse providing semver comliant version string
-func (semver Version) String() string {
+// String returns semver compliant version string. It is efectively a reverse of Parse/MustParse functions.
+func (semver *Version) String() string {
 	version := fmt.Sprintf("%s.%s.%s", semver.Major, semver.Minor, semver.Patch)
 	if len(semver.Prerelease) > 0 {
 		version = fmt.Sprintf("%s-%s", version, strings.Join(semver.Prerelease, "."))
@@ -329,6 +329,7 @@ func positionErr(pos int, format string, a ...interface{}) error {
 	}
 }
 
+// Error returns
 func (e *positionError) Error() string {
 	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
 }
@@ -381,7 +382,7 @@ func number(f func(v *Version, num string)) consumer {
 			num = stream[0 : i+1]
 			remain = stream[i+1:]
 		}
-		if len(num) == 0 {
+		if num == "" {
 			return stream, positionErr(pos+1, "expected number")
 		}
 		if len(num) > 1 && num[0] == '0' {
@@ -413,7 +414,7 @@ func sequence(cs ...consumer) consumer {
 			if err != nil {
 				return stream, err
 			}
-			pos = pos + (len(stream) - len(remain))
+			pos += (len(stream) - len(remain))
 			stream = remain
 		}
 		return stream, nil
@@ -427,14 +428,14 @@ func optional(cs consumer, c ...consumer) consumer {
 			return stream, nil
 		}
 
-		pos = pos + (len(stream) - len(remain))
+		pos += (len(stream) - len(remain))
 
 		for _, consumer := range c {
 			remain, err = consumer(pos, remain, v)
 			if err != nil {
 				return stream, err
 			}
-			pos = pos + (len(stream) - len(remain))
+			pos += (len(stream) - len(remain))
 		}
 		return remain, err
 	}
@@ -452,7 +453,7 @@ func repeat(c ...consumer) consumer {
 				}
 				return stream, err
 			}
-			pos = pos + (oldRemainLen - len(remain))
+			pos += (oldRemainLen - len(remain))
 		}
 		return remain, nil
 	}
@@ -460,7 +461,7 @@ func repeat(c ...consumer) consumer {
 
 func prerelease() consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
-		if len(stream) == 0 {
+		if stream == "" {
 			return "", positionErr(pos, "no prerelease found because of unexpected end of stream")
 		}
 		remain = stream
@@ -499,7 +500,7 @@ func prerelease() consumer {
 
 func buildmetadata() consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
-		if len(stream) == 0 {
+		if stream == "" {
 			return "", positionErr(pos, "no buildmetadata found because of unexpected end of stream")
 		}
 		for i, s := range stream {

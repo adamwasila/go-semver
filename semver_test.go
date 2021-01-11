@@ -302,7 +302,7 @@ func BenchmarkParse(b *testing.B) {
 }
 
 func BenchmarkValid(b *testing.B) {
-	v := "1.2.3-alpha.1+build.7d97e98f8af710c7e7fe703abc8f639e0ee507c4"
+	v := "7.8.9-beta.1+build.7d97e98f8af710c7e7fe703abc8f639e0ee507c4"
 	for i := 0; i < b.N; i++ {
 		_ = semver.Valid(v)
 	}
@@ -422,7 +422,7 @@ func TestVersion_Bump(t *testing.T) {
 			args{baseVersion: "1.2.3", options: opts{semver.ImplementationChange}}, result{expectedVersion: "1.2.4"},
 		},
 
-		//TODO
+		// TODO
 		// {"by default prerelease version bumps to next prerelease version if last component is number",
 		// 	args{baseVersion: "1.2.3-rc.1"}, result{expectedVersion: "1.2.3-rc.2"},
 		// },
@@ -433,7 +433,10 @@ func TestVersion_Bump(t *testing.T) {
 			args{baseVersion: "4.3.2+hello"}, result{expectedVersion: "5.0.0"},
 		},
 		{"with explicit option bumps and sets buildmetadata",
-			args{baseVersion: "1.0.0+test", options: opts{semver.BreakingChange, semver.BuildMetadata("other")}}, result{expectedVersion: "2.0.0+other"},
+			args{
+				baseVersion: "1.0.0+test",
+				options:     opts{semver.BreakingChange, semver.BuildMetadata("other")}},
+			result{expectedVersion: "2.0.0+other"},
 		},
 	}
 
