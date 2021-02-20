@@ -329,7 +329,7 @@ func positionErr(pos int, format string, a ...interface{}) error {
 	}
 }
 
-// Error returns
+// Error returns error with stream position where error has occurred
 func (e *positionError) Error() string {
 	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
 }
@@ -342,6 +342,7 @@ func semverParser() consumer {
 		dot(),
 		patch(),
 		optional(minus(), prerelease(), repeat(dot(), prerelease())),
+
 		optional(plus(), buildmetadata(), repeat(dot(), buildmetadata())),
 		excess(),
 	}
