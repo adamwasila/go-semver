@@ -6,7 +6,7 @@
 
 Simple version string parser, bulider, bumper etc. Follows strictly [semantic Versioning 2.0.0 specification](https://semver.org/) and has unit tests to ensure it works for most edge cases.
 
-> Note: this isn't stable version yet. It should do the job and all tests are passing bug API will be freezed only after version 1.0.0 tag. No promises till that point.
+> Note: this isn't stable version yet. It should do the job and all tests are passing but API will be freezed only after version 1.0.0 tag. No promises till that point.
 
 ## Features
 
@@ -67,6 +67,54 @@ Output:
 
 ```console
 2.0.0
+```
+
+## Tools
+
+There are few commandline tools available built with help of this library stored in this repository. These can be regarded as example of library use but should be useful as standalone tools used for release scripting.
+
+### semver-verify
+
+Validates versions specified in argument list returning error code and description of each version that does not follow semver 2.0 format strictly.
+
+Example of use:
+
+```console
+$ semver-verify 1.0.0 2.1.1 3.0.0-rc.1 4.0.0-invalid.~
+
+Invalid version: '4.0.0-invalid.~', error at position 14: invalid character in prerelease identifier: '~'
+```
+
+### semver-sort
+
+Reads standard input with list of versions, sorts them accordingly and returns the result. Have few flags to customize output as shown in following examples:
+
+Sort list of versions, plain and simple (default behaviour):
+
+```console
+echo "17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort
+
+1.2.3
+2.0.0-alpha.0
+2.0.0-beta.0
+2.0.0-rc.0
+17.0.0 
+```
+
+Show only the last (newest) version in the set:
+
+```console
+echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1
+
+17.0.0
+```
+
+Show oldest version in the set:
+
+```console
+echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1 -r
+
+1.2.3
 ```
 
 ## License
