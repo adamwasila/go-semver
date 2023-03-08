@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/adamwasila/semver"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestExamplesFromWebpage(t *testing.T) {
@@ -34,7 +32,10 @@ func TestExamplesFromWebpage(t *testing.T) {
 	for i, version := range validVersions {
 		t.Run(fmt.Sprintf("#%d", i), func(t *testing.T) {
 			valid := semver.Valid(version)
-			assert.True(t, valid)
+			if !valid {
+				t.Fatalf("expected successful parsing of a version: %s", version)
+				t.FailNow()
+			}
 
 			v, err := semver.Parse(version)
 			if err != nil {
@@ -95,7 +96,10 @@ func TestExamplesFromWebpageInvalid(t *testing.T) {
 	for _, version := range invalidVersions {
 		t.Run(version, func(t *testing.T) {
 			valid := semver.Valid(version)
-			require.False(t, valid)
+			if valid {
+				t.Fatalf("expected to fail parsing as a version: %s", version)
+				t.FailNow()
+			}
 
 			_, err := semver.Parse(version)
 			if err == nil {
@@ -214,12 +218,20 @@ func TestNew(t *testing.T) {
 			got, err := semver.New(tt.opts...)
 
 			if tt.wantErr {
-				assert.Error(t, err)
-			}
+				if err == nil {
+					t.Errorf("expected error constructing version but there was none")
+					t.FailNow()
+				}
+			} else {
+				if err != nil {
+					t.Errorf("expected no error constructing version but there was one: %v", err)
+					t.FailNow()
+				}
 
-			if !tt.wantErr {
-				assert.Nil(t, err)
-				assert.Equal(t, tt.want, got.String())
+				if tt.want != got.String() {
+					t.Errorf("version built: %s is different than expected: %s", got.String(), tt.want)
+					t.FailNow()
+				}
 			}
 		})
 	}
@@ -276,12 +288,24 @@ func TestSortSemver(t *testing.T) {
 					asc := less(tt.sortedVersions[i], tt.sortedVersions[j])
 					desc := less(tt.sortedVersions[j], tt.sortedVersions[i])
 					if tt.allEquals {
-						assert.False(t, asc, "Should be: %s == %s", tt.sortedVersions[i], tt.sortedVersions[j])
-						assert.False(t, desc, "Should be: %s == %s", tt.sortedVersions[j], tt.sortedVersions[i])
+						if asc {
+							t.Errorf("Should be: %s == %s", tt.sortedVersions[i], tt.sortedVersions[j])
+							t.Fail()
+						}
+						if desc {
+							t.Errorf("Should be: %s == %s", tt.sortedVersions[i], tt.sortedVersions[j])
+							t.Fail()
+						}
 						break
 					}
-					assert.True(t, asc, "Should be: %s < %s", tt.sortedVersions[i], tt.sortedVersions[j])
-					assert.False(t, desc, "Should be: %s >= %s", tt.sortedVersions[j], tt.sortedVersions[i])
+					if !asc {
+						t.Errorf("Should be: %s < %s", tt.sortedVersions[i], tt.sortedVersions[j])
+						t.Fail()
+					}
+					if desc {
+						t.Errorf("Should be: %s >= %s", tt.sortedVersions[j], tt.sortedVersions[i])
+						t.Fail()
+					}
 				}
 			}
 		})
@@ -446,8 +470,17 @@ func TestVersion_Bump(t *testing.T) {
 
 			resultSv, err := sv.Bump(tt.args.options...)
 
-			assert.Equal(t, semver.MustParse(tt.result.expectedVersion), resultSv)
-			assert.Equal(t, tt.result.expectError, err != nil)
+			if (err != nil) != tt.result.expectError {
+				t.Errorf("bumping vesion returned error: %s which is unexpected", err)
+				t.FailNow()
+			}
+
+			result := semver.MustParse(tt.result.expectedVersion)
+
+			if result.String() != resultSv.String() {
+				t.Errorf("bumped version: %s is different than expected: %s", resultSv, result)
+				t.FailNow()
+			}
 		})
 	}
 }
