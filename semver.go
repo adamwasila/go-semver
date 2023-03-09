@@ -170,6 +170,31 @@ func implementationChange() BumpOption {
 	}
 }
 
+func Release() BumpOption {
+	return func(v *Version) error {
+		if len(v.Prerelease) == 0 {
+			return fmt.Errorf("no prerelease set in version")
+		}
+		v.Prerelease = []string{}
+		return nil
+	}
+}
+
+func BumpOptionBuildmetadata(metadata []string) BumpOption {
+	return func(s *Version) error {
+		if len(metadata) == 0 {
+			return nil
+		}
+		for _, m := range metadata {
+			if m == "" {
+				return fmt.Errorf("invalid build metadata")
+			}
+		}
+		s.Buildmetadata = metadata
+		return nil
+	}
+}
+
 // Bump changes version to newer using provided list of bump options
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
@@ -331,6 +356,11 @@ func positionErr(pos int, format string, a ...interface{}) error {
 
 // Error returns error with stream position where error has occurred
 func (e *positionError) Error() string {
+	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
+}
+
+// Error returns error with stream position where error has occurred
+func (e *positionError) VerboseError() string {
 	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
 }
 

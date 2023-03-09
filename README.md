@@ -92,7 +92,7 @@ Reads standard input with list of versions, sorts them accordingly and returns t
 Sort list of versions, plain and simple (default behaviour):
 
 ```console
-echo "17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort
+$ echo "17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort
 
 1.2.3
 2.0.0-alpha.0
@@ -104,7 +104,7 @@ echo "17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort
 Show only the last (newest) version in the set:
 
 ```console
-echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1
+$ echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1
 
 17.0.0
 ```
@@ -112,9 +112,35 @@ echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0
 Show oldest version in the set:
 
 ```console
-echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1 -r
+$ echo "3.0.0 5.0.0 17.0.0-prerelease0 17.0.0 1.2.3 2.0.0-rc.0 2.0.0-alpha.0 2.0.0-beta.0" | semver-sort -1 -r
 
 1.2.3
+```
+
+### semver-bump
+
+Reads single version given as argument and bump it to next version with help of specified flags.
+
+If no specific flag given will attempt to bump into next patch version.
+
+Examples:
+
+```console
+$ semver-bump -major 2.4.16
+
+3.0.0
+```
+
+```console
+$ semver-bump -meta `git rev-parse HEAD` -patch 1.2.3
+
+1.2.4+e8175a115ddbb63de0d34003ed0acde9cd66e21f
+```
+
+```console
+$ semver-bump -release 2.0.0-rc.0
+
+2.0.0
 ```
 
 ## License
