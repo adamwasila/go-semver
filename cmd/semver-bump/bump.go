@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/adamwasila/semver"
 )
@@ -50,16 +49,10 @@ func main() {
 	}
 
 	var newVersion semver.Version
-	var meta []string
-
-	if buildmetadata != "" {
-		meta = strings.Split(buildmetadata, ".")
-	}
-
 	var opts []semver.BumpOption
 
-	if len(meta) > 0 {
-		opts = append(opts, semver.BumpOptionBuildmetadata(meta))
+	if buildmetadata != "" {
+		opts = append(opts, semver.BuildMetadata(buildmetadata))
 	}
 
 	switch {

@@ -180,21 +180,6 @@ func Release() BumpOption {
 	}
 }
 
-func BumpOptionBuildmetadata(metadata []string) BumpOption {
-	return func(s *Version) error {
-		if len(metadata) == 0 {
-			return nil
-		}
-		for _, m := range metadata {
-			if m == "" {
-				return fmt.Errorf("invalid build metadata")
-			}
-		}
-		s.Buildmetadata = metadata
-		return nil
-	}
-}
-
 // Bump changes version to newer using provided list of bump options
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
