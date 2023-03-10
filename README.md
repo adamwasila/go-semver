@@ -2,7 +2,8 @@
 
 # go-semver
 
-[![Go Report Card](https://goreportcard.com/badge/adamwasila/go-semver)](https://goreportcard.com/report/adamwasila/go-semver) [![Build Status](https://travis-ci.com/adamwasila/go-semver.svg?branch=master)](https://travis-ci.com/adamwasila/go-semver) [![Coverage Status](https://coveralls.io/repos/github/adamwasila/go-semver/badge.svg?branch=master)](https://coveralls.io/github/adamwasila/go-semver?branch=master) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/adamwasila/go-semver) ![GitHub](https://img.shields.io/github/license/adamwasila/go-semver)
+[![Go Report Card](https://goreportcard.com/badge/adamwasila/go-semver)](https://goreportcard.com/report/adamwasila/go-semver) [![Build Status](https://github.com/adamwasila/go-semver/actions/workflows/main.yml/badge.svg)](https://github.com/adamwasila/go-semver/actions/workflows/main.yml) [![Coverage Status](https://coveralls.io/repos/github/adamwasila/go-semver/badge.svg?branch=master)](https://coveralls.io/github/adamwasila/go-semver?branch=master) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/adamwasila/go-semver) ![GitHub](https://img.shields.io/github/license/adamwasila/go-semver)
+
 
 Simple version string parser, bulider, bumper etc. Follows strictly [semantic Versioning 2.0.0 specification](https://semver.org/) and has unit tests to ensure it works for most edge cases.
 
