@@ -443,7 +443,8 @@ func TestVersion_Bump(t *testing.T) {
 			result{expectedVersion: "1.3.0"},
 		},
 		{"with explicit option withbugfix/implementation change version bumps to next patch version",
-			args{baseVersion: "1.2.3", options: opts{semver.ImplementationChange}}, result{expectedVersion: "1.2.4"},
+			args{baseVersion: "1.2.3", options: opts{semver.ImplementationChange}},
+			result{expectedVersion: "1.2.4"},
 		},
 
 		// TODO
@@ -454,12 +455,11 @@ func TestVersion_Bump(t *testing.T) {
 		// 	args{baseVersion: "1.2.3-alpha.1.72"}, result{expectedVersion: "1.2.3-alpha.1.73"},
 		// },
 		{"by default version bumps and clears buildmetadata",
-			args{baseVersion: "4.3.2+hello"}, result{expectedVersion: "5.0.0"},
+			args{baseVersion: "4.3.2+hello"},
+			result{expectedVersion: "5.0.0"},
 		},
 		{"with explicit option bumps and sets buildmetadata",
-			args{
-				baseVersion: "1.0.0+test",
-				options:     opts{semver.BreakingChange, semver.BuildMetadata("other")}},
+			args{baseVersion: "1.0.0+test", options: opts{semver.BreakingChange, semver.BuildMetadata("other")}},
 			result{expectedVersion: "2.0.0+other"},
 		},
 	}
