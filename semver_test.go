@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/adamwasila/semver"
+	"github.com/adamwasila/go-semver"
 )
 
 func TestExamplesFromWebpage(t *testing.T) {

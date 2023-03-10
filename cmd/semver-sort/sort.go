@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/adamwasila/semver"
+	"github.com/adamwasila/go-semver"
 )
 
 var extraHelp string = "\n" +

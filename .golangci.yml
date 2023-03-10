@@ -2,7 +2,7 @@ linters-settings:
   depguard:
     list-type: whitelist
     packages:
-    - github.com/adamwasila/semver
+    - github.com/adamwasila/go-semver
     - github.com/stretchr/testify/assert
     - github.com/stretchr/testify/require
     inTests:

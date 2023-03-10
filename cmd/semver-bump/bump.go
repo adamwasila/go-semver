@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/adamwasila/semver"
+	"github.com/adamwasila/go-semver"
 )
 
 var extraHelp string = "\n" +
