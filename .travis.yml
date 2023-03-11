@@ -1,7 +1,0 @@
-language: go
-go:
- - "1.15"
-after_success:
- - go get github.com/mattn/goveralls
- - "go test -v -covermode=count -coverprofile=coverage.out"
- - "goveralls -coverprofile=coverage.out -service=travis-cia"
