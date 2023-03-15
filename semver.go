@@ -125,9 +125,6 @@ func compose(opts ...func(*Version) error) func(*Version) error {
 // BumpOption is function option that changes version to newer
 type BumpOption func(*Version) error
 
-// BreakingChange is major version increment
-var BreakingChange BumpOption = breakingChange()
-
 func increment(n string) string {
 	bigN, ok := big.NewInt(0).SetString(n, 10)
 	if !ok {
@@ -137,7 +134,8 @@ func increment(n string) string {
 	return bigN.String()
 }
 
-func breakingChange() BumpOption {
+// BreakingChange is major version increment
+func BreakingChange() BumpOption {
 	return func(s *Version) error {
 		s.Major = increment(s.Major)
 		s.Minor = "0"
@@ -148,9 +146,7 @@ func breakingChange() BumpOption {
 }
 
 // FeatureChange is minor version increment
-var FeatureChange BumpOption = featureChange()
-
-func featureChange() BumpOption {
+func FeatureChange() BumpOption {
 	return func(s *Version) error {
 		s.Minor = increment(s.Minor)
 		s.Patch = "0"
@@ -160,9 +156,7 @@ func featureChange() BumpOption {
 }
 
 // ImplementationChange is patch version increment
-var ImplementationChange BumpOption = implementationChange()
-
-func implementationChange() BumpOption {
+func ImplementationChange() BumpOption {
 	return func(s *Version) error {
 		s.Patch = increment(s.Patch)
 		s.Prerelease = []string{}
@@ -184,7 +178,7 @@ func Release() BumpOption {
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
 		options = []BumpOption{
-			BreakingChange,
+			BreakingChange(),
 			BuildMetadata(""),
 		}
 	}

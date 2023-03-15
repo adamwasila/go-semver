@@ -57,15 +57,15 @@ func main() {
 
 	switch {
 	case major:
-		opts = append(opts, semver.BreakingChange)
+		opts = append(opts, semver.BreakingChange())
 	case minor:
-		opts = append(opts, semver.FeatureChange)
+		opts = append(opts, semver.FeatureChange())
 	case patch:
-		opts = append(opts, semver.ImplementationChange)
+		opts = append(opts, semver.ImplementationChange())
 	case release:
 		opts = append(opts, semver.Release())
 	default:
-		opts = append(opts, semver.ImplementationChange)
+		opts = append(opts, semver.ImplementationChange())
 	}
 
 	newVersion, err = parsedVersion.Bump(opts...)
