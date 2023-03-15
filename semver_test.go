@@ -112,10 +112,9 @@ func TestExamplesFromWebpageInvalid(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	tests := []struct {
-		name    string
-		opts    []func(*semver.Version) error
-		want    string
-		wantErr bool
+		name string
+		opts []func(*semver.Version) error
+		want string
 	}{
 		{
 			"1.2.3",
@@ -123,7 +122,6 @@ func TestNew(t *testing.T) {
 				semver.SetCore("1.2.3"),
 			},
 			"1.2.3",
-			false,
 		},
 		{
 			"0.0.0-alpha.1",
@@ -131,7 +129,6 @@ func TestNew(t *testing.T) {
 				semver.Prerelease("alpha.1"),
 			},
 			"0.0.0-alpha.1",
-			false,
 		},
 		{
 			"0.0.0+buildxyz",
@@ -139,7 +136,6 @@ func TestNew(t *testing.T) {
 				semver.BuildMetadata("buildxyz"),
 			},
 			"0.0.0+buildxyz",
-			false,
 		},
 		{
 			"0.0.0-beta.2+buildxyz",
@@ -148,10 +144,10 @@ func TestNew(t *testing.T) {
 				semver.BuildMetadata("buildxyz"),
 			},
 			"0.0.0-beta.2+buildxyz",
-			false,
 		},
 		{
-			"1.2.3-4.5.6+7.8.9", []func(*semver.Version) error{
+			"1.2.3-4.5.6+7.8.9",
+			[]func(*semver.Version) error{
 				semver.SetCore("1.2.3"),
 				semver.Prerelease("4"),
 				semver.Prerelease("5"),
@@ -159,7 +155,8 @@ func TestNew(t *testing.T) {
 				semver.BuildMetadata("7"),
 				semver.BuildMetadata("8"),
 				semver.BuildMetadata("9"),
-			}, "1.2.3-4.5.6+7.8.9", false,
+			},
+			"1.2.3-4.5.6+7.8.9",
 		},
 		{
 			"1.2.3-4.5.6+7.8.9 (2)",
@@ -171,7 +168,6 @@ func TestNew(t *testing.T) {
 				semver.BuildMetadata("9"),
 			},
 			"1.2.3-4.5.6+7.8.9",
-			false,
 		},
 		{
 			"1.2.3-4.5.6+7.8.9 (2)",
@@ -183,16 +179,36 @@ func TestNew(t *testing.T) {
 				semver.BuildMetadata("9"),
 			},
 			"1.2.3-4.5.6+7.8.9",
-			false,
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := semver.New(tt.opts...)
+
+			if err != nil {
+				t.Errorf("expected no error constructing version but there was one: %v", err)
+				t.FailNow()
+			}
+
+			if tt.want != got.String() {
+				t.Errorf("version built: %s is different than expected: %s", got.String(), tt.want)
+				t.FailNow()
+			}
+		})
+	}
+}
+
+func TestNewInvalid(t *testing.T) {
+	tests := []struct {
+		name string
+		opts []func(*semver.Version) error
+	}{
 		{
 			"Invalid prerelease",
 			[]func(*semver.Version) error{
 				semver.SetCore("1.2.3"),
 				semver.Prerelease("1_2"),
 			},
-			"",
-			true,
 		},
 		{
 			"Invalid prerelease",
@@ -200,8 +216,6 @@ func TestNew(t *testing.T) {
 				semver.SetCore("1.2.3"),
 				semver.Prerelease("1.02"),
 			},
-			"",
-			true,
 		},
 		{
 			"Invalid buildmetadata",
@@ -209,29 +223,15 @@ func TestNew(t *testing.T) {
 				semver.SetCore("1.2.3"),
 				semver.BuildMetadata("a_b"),
 			},
-			"",
-			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := semver.New(tt.opts...)
+			_, err := semver.New(tt.opts...)
 
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("expected error constructing version but there was none")
-					t.FailNow()
-				}
-			} else {
-				if err != nil {
-					t.Errorf("expected no error constructing version but there was one: %v", err)
-					t.FailNow()
-				}
-
-				if tt.want != got.String() {
-					t.Errorf("version built: %s is different than expected: %s", got.String(), tt.want)
-					t.FailNow()
-				}
+			if err == nil {
+				t.Errorf("expected error constructing version but there was none")
+				t.FailNow()
 			}
 		})
 	}
