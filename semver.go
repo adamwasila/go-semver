@@ -126,9 +126,10 @@ func compose(opts ...func(*Version) error) func(*Version) error {
 type BumpOption func(*Version) error
 
 func increment(n string) string {
-	bigN, ok := big.NewInt(0).SetString(n, 10)
+	const baseDec = 10
+	bigN, ok := big.NewInt(0).SetString(n, baseDec)
 	if !ok {
-		panic("Oh no!!")
+		panic("incrementing corrupted version number")
 	}
 	bigN.Add(bigN, big.NewInt(1))
 	return bigN.String()
