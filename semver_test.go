@@ -364,7 +364,7 @@ func ExampleMustParse() {
 
 func ExampleVersion_Bump() {
 	sv := semver.MustParse("1.2.3-rc.1+cafebabe")
-	sv, _ = sv.Bump(semver.BreakingChange())
+	sv, _ = sv.Bump(semver.BumpMajor())
 	fmt.Printf("%s", sv.String())
 	// Output:
 	// 2.0.0
@@ -435,15 +435,15 @@ func TestVersion_Bump(t *testing.T) {
 			result{expectedVersion: "2.0.0"},
 		},
 		{"with explicit option breaking change version bumps to next major version",
-			args{baseVersion: "1.2.3", options: opts{semver.BreakingChange()}},
+			args{baseVersion: "1.2.3", options: opts{semver.BumpMajor()}},
 			result{expectedVersion: "2.0.0"},
 		},
 		{"with explicit option feature add version bumps to next minor version",
-			args{baseVersion: "1.2.3", options: opts{semver.FeatureChange()}},
+			args{baseVersion: "1.2.3", options: opts{semver.BumpMinor()}},
 			result{expectedVersion: "1.3.0"},
 		},
 		{"with explicit option withbugfix/implementation change version bumps to next patch version",
-			args{baseVersion: "1.2.3", options: opts{semver.ImplementationChange()}},
+			args{baseVersion: "1.2.3", options: opts{semver.BumpPatch()}},
 			result{expectedVersion: "1.2.4"},
 		},
 
@@ -459,7 +459,7 @@ func TestVersion_Bump(t *testing.T) {
 			result{expectedVersion: "5.0.0"},
 		},
 		{"with explicit option bumps and sets buildmetadata",
-			args{baseVersion: "1.0.0+test", options: opts{semver.BreakingChange(), semver.BuildMetadata("other")}},
+			args{baseVersion: "1.0.0+test", options: opts{semver.BumpMajor(), semver.BuildMetadata("other")}},
 			result{expectedVersion: "2.0.0+other"},
 		},
 	}
