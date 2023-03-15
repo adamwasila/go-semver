@@ -176,6 +176,26 @@ func BumpRelease() BumpOption {
 	}
 }
 
+// BumpPrerelease is incrementing last numeric prerelease component
+func BumpPrelease() BumpOption {
+	return func(v *Version) error {
+		if len(v.Prerelease) == 0 {
+			return fmt.Errorf("no prerelease set in version")
+		}
+		for i := len(v.Prerelease) - 1; i >= 0; i-- {
+			const baseDec = 10
+			bigN, ok := big.NewInt(0).SetString(v.Prerelease[i], baseDec)
+			one := big.NewInt(1)
+			if ok {
+				bigN.Add(bigN, one)
+				v.Prerelease[i] = bigN.String()
+				break
+			}
+		}
+		return nil
+	}
+}
+
 // Bump changes version to newer using provided list of bump options
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {

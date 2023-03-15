@@ -446,14 +446,19 @@ func TestVersion_Bump(t *testing.T) {
 			args{baseVersion: "1.2.3", options: opts{semver.BumpPatch()}},
 			result{expectedVersion: "1.2.4"},
 		},
-
-		// TODO
-		// {"by default prerelease version bumps to next prerelease version if last component is number",
-		// 	args{baseVersion: "1.2.3-rc.1"}, result{expectedVersion: "1.2.3-rc.2"},
-		// },
-		// {"by default prerelease version bumps to next prerelease version but only last component",
-		// 	args{baseVersion: "1.2.3-alpha.1.72"}, result{expectedVersion: "1.2.3-alpha.1.73"},
-		// },
+		{"prerelease version bumps to next prerelease version if last component is number",
+			args{baseVersion: "1.2.3-rc.1", options: opts{semver.BumpPrelease()}}, result{expectedVersion: "1.2.3-rc.2"},
+		},
+		{"prerelease version bumps to next prerelease version looking for last component number",
+			args{baseVersion: "1.2.3-rc.1.doh", options: opts{semver.BumpPrelease()}}, result{expectedVersion: "1.2.3-rc.2.doh"},
+		},
+		{"prerelease version bumps to next prerelease version looking only for last component number",
+			args{baseVersion: "1.2.3-rc.1.1", options: opts{semver.BumpPrelease()}}, result{expectedVersion: "1.2.3-rc.1.2"},
+		},
+		{"prerelease version bumps to next prerelease even for very large numbers",
+			args{baseVersion: "1.2.3-rc.324762873462783468723468723", options: opts{semver.BumpPrelease()}},
+			result{expectedVersion: "1.2.3-rc.324762873462783468723468724"},
+		},
 		{"by default version bumps and clears buildmetadata",
 			args{baseVersion: "4.3.2+hello"},
 			result{expectedVersion: "5.0.0"},
@@ -478,7 +483,7 @@ func TestVersion_Bump(t *testing.T) {
 			result := semver.MustParse(tt.result.expectedVersion)
 
 			if result.String() != resultSv.String() {
-				t.Errorf("bumped version: %s is different than expected: %s", resultSv, result)
+				t.Errorf("bumped version: %s is different than expected: %s", resultSv.String(), result.String())
 				t.FailNow()
 			}
 		})
