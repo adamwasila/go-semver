@@ -342,27 +342,20 @@ var defaultParser = semverParser()
 type consumer func(pos int, stream string, v *Version) (remain string, err error)
 
 type positionError struct {
-	pos  int
-	msg  string
-	args []interface{}
+	pos int
+	msg string
 }
 
 func positionErr(pos int, format string, a ...interface{}) error {
 	return &positionError{
-		pos:  pos,
-		msg:  format,
-		args: a,
+		pos: pos,
+		msg: fmt.Sprintf(format, a...),
 	}
 }
 
 // Error returns error with stream position where error has occurred
 func (e *positionError) Error() string {
-	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
-}
-
-// Error returns error with stream position where error has occurred
-func (e *positionError) VerboseError() string {
-	return fmt.Sprintf("error at position %d: ", e.pos) + fmt.Sprintf(e.msg, e.args...)
+	return fmt.Sprintf("error at position %d: %s", e.pos, e.msg)
 }
 
 func semverParser() consumer {
