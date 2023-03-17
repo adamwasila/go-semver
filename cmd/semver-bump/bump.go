@@ -20,7 +20,7 @@ func main() {
 	}
 
 	var (
-		major, minor, patch, release bool
+		major, minor, patch, prerelease, release bool
 
 		buildmetadata string
 	)
@@ -28,6 +28,9 @@ func main() {
 	flag.BoolVar(&major, "major", false, "Bump to next major version")
 	flag.BoolVar(&minor, "minor", false, "Bump to next minor version")
 	flag.BoolVar(&patch, "patch", false, "Bump to next patch version")
+	flag.BoolVar(&prerelease, "prerelease", false,
+		"Will try to upgrade to next prerelese number by incrementing"+
+			" last number component in prerelease tag")
 	flag.BoolVar(&release, "release", false, "Strip prerelease from version")
 
 	flag.StringVar(&buildmetadata, "meta", "", "Optional build metadata attached to new version. Can be used multiple times.")
@@ -62,6 +65,8 @@ func main() {
 		opts = append(opts, semver.BumpMinor())
 	case patch:
 		opts = append(opts, semver.BumpPatch())
+	case prerelease:
+		opts = append(opts, semver.BumpPrelease())
 	case release:
 		opts = append(opts, semver.BumpRelease())
 	default:
