@@ -29,7 +29,7 @@ func main() {
 	flag.BoolVar(&minor, "minor", false, "Bump to next minor version")
 	flag.BoolVar(&patch, "patch", false, "Bump to next patch version")
 	flag.BoolVar(&prerelease, "prerelease", false,
-		"Will try to upgrade to next prerelese number by incrementing"+
+		"Try to upgrade to next prerelese version by incrementing"+
 			" last number component in prerelease tag")
 	flag.BoolVar(&release, "release", false, "Strip prerelease from version")
 
