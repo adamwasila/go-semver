@@ -23,6 +23,7 @@ func main() {
 		major, minor, patch, prerelease, release bool
 
 		buildmetadata string
+		keepMetadata  bool
 	)
 
 	flag.BoolVar(&major, "major", false, "Bump to next major version")
@@ -34,6 +35,7 @@ func main() {
 	flag.BoolVar(&release, "release", false, "Strip prerelease from version")
 
 	flag.StringVar(&buildmetadata, "meta", "", "Optional build metadata attached to new version. Can be used multiple times.")
+	flag.BoolVar(&keepMetadata, "keep-meta", false, "Do not reset originam metadata when bumping to new version")
 
 	flag.Parse()
 	versions := flag.Args()
@@ -53,6 +55,12 @@ func main() {
 
 	var newVersion semver.Version
 	var opts []semver.BumpOption
+
+	if keepMetadata {
+		for _, bm := range parsedVersion.Buildmetadata {
+			opts = append(opts, semver.BuildMetadata(bm))
+		}
+	}
 
 	if buildmetadata != "" {
 		opts = append(opts, semver.BuildMetadata(buildmetadata))
