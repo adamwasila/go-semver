@@ -41,7 +41,7 @@ func main() {
 	versions := flag.Args()
 
 	if len(versions) != 1 {
-		fmt.Fprintf(flag.CommandLine.Output(), "Only one argument expected: version")
+		fmt.Fprintf(flag.CommandLine.Output(), "expected single argument: version\n")
 		os.Exit(1)
 	}
 
