@@ -376,12 +376,12 @@ func semverParser() consumer {
 func literal(val string) consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
 		if stream == "" {
-			return stream, positionErr(pos, "expected: '%s' but version too short", val)
+			return stream, positionErr(pos, "unexpected end of stream while %s was expected", nameFor(val))
 		}
 		if strings.HasPrefix(stream, val) {
 			return stream[len(val):], nil
 		}
-		return stream, positionErr(pos, "expected: '%s' but found: '%s' instead", val, stream[0:len(val)])
+		return stream, positionErr(pos, "unexpected character in place where %s was expected", nameFor(val))
 	}
 }
 
@@ -397,6 +397,19 @@ func minus() consumer {
 	return literal("-")
 }
 
+func nameFor(val string) string {
+	switch val {
+	case ".":
+		return "dot"
+	case "+":
+		return "plus"
+	case "-":
+		return "minus"
+	default:
+		return val
+	}
+}
+
 func number(f func(v *Version, num string)) consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
 		var num string
@@ -408,10 +421,10 @@ func number(f func(v *Version, num string)) consumer {
 			remain = stream[i+1:]
 		}
 		if num == "" {
-			return stream, positionErr(pos+1, "expected number")
+			return stream, positionErr(pos+1, "unexpected non-numeric character")
 		}
 		if len(num) > 1 && num[0] == '0' {
-			return stream, positionErr(pos+1, "number %s should not have leading zero(s)", num)
+			return stream, positionErr(pos+1, "unexpected leading zero")
 		}
 
 		f(v, num)
@@ -487,7 +500,7 @@ func repeat(c ...consumer) consumer {
 func prerelease() consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
 		if stream == "" {
-			return "", positionErr(pos, "no prerelease found because of unexpected end of stream")
+			return "", positionErr(pos, "unexpected end of stream in prerelease")
 		}
 		remain = stream
 		numberFlag := true
@@ -495,7 +508,7 @@ func prerelease() consumer {
 		for i, s := range stream {
 			if s == '.' || s == '+' {
 				if i == 0 {
-					return stream, positionErr(pos+i, "prerelease identifier cannot be empty")
+					return stream, positionErr(pos+i, "unexpected empty prerelease")
 				}
 				token = stream[:i]
 				v.Prerelease = append(v.Prerelease, token)
@@ -503,7 +516,7 @@ func prerelease() consumer {
 				break
 			}
 			if (s < '0' || s > '9') && (s < 'a' || s > 'z') && (s < 'A' || s > 'Z') && s != '-' {
-				return stream, positionErr(pos+i-1, "invalid character in prerelease identifier: '%v'", string(s))
+				return stream, positionErr(pos+i-1, "invalid character in prerelease")
 			}
 			if s < '0' || s > '9' {
 				numberFlag = false
@@ -516,7 +529,7 @@ func prerelease() consumer {
 		}
 		if token != "" && numberFlag {
 			if len(token) > 1 && token[0] == '0' {
-				return stream, positionErr(pos, "number %s should not have leading zero(s)", token)
+				return stream, positionErr(pos, "unexpected leading zero")
 			}
 		}
 		return remain, err
@@ -526,18 +539,18 @@ func prerelease() consumer {
 func buildmetadata() consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
 		if stream == "" {
-			return "", positionErr(pos, "no buildmetadata found because of unexpected end of stream")
+			return "", positionErr(pos, "unexpected end of stream in buildmetadata")
 		}
 		for i, s := range stream {
 			if s == '.' || s == '+' {
 				if i == 0 {
-					return stream, positionErr(pos+i, "prerelease identifier cannot be empty")
+					return stream, positionErr(pos+i, "unexpected empty prerelease")
 				}
 				v.Buildmetadata = append(v.Buildmetadata, stream[:i])
 				return stream[i:], nil
 			}
 			if (s < '0' || s > '9') && (s < 'a' || s > 'z') && (s < 'A' || s > 'Z') && s != '-' {
-				return stream, positionErr(pos+i, "invalid character in buildmetadata identifier: '%v'", string(s))
+				return stream, positionErr(pos+i, "invalid character in buildmetadata")
 			}
 		}
 		v.Buildmetadata = append(v.Buildmetadata, stream)
@@ -548,7 +561,7 @@ func buildmetadata() consumer {
 func excess() consumer {
 	return func(pos int, stream string, v *Version) (remain string, err error) {
 		if stream != "" {
-			return stream, positionErr(pos, "extra data at the end: %s", stream)
+			return stream, positionErr(pos, "unexpected extra data")
 		}
 		return "", nil
 	}
