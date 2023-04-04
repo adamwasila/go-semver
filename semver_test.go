@@ -34,17 +34,14 @@ func TestExamplesFromWebpage(t *testing.T) {
 			valid := semver.Valid(version)
 			if !valid {
 				t.Fatalf("expected successful parsing of a version: %s", version)
-				t.FailNow()
 			}
 
 			v, err := semver.Parse(version)
 			if err != nil {
 				t.Fatalf("version '%s' should be valid but got '%s' instead", version, err)
-				t.FailNow()
 			}
 			if v.String() != version {
 				t.Fatalf("version '%s' and parsed then serialized '%s' should be equal", version, v.String())
-				t.FailNow()
 			}
 		})
 	}
@@ -98,13 +95,11 @@ func TestExamplesFromWebpageInvalid(t *testing.T) {
 			valid := semver.Valid(version)
 			if valid {
 				t.Fatalf("expected to fail parsing as a version: %s", version)
-				t.FailNow()
 			}
 
 			_, err := semver.Parse(version)
 			if err == nil {
 				t.Fatalf("version '%s' should be invalid", version)
-				t.FailNow()
 			}
 		})
 	}

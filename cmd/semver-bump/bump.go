@@ -8,7 +8,7 @@ import (
 	"github.com/adamwasila/go-semver"
 )
 
-var extraHelp string = "\n" +
+var extraHelp = "\n" +
 	"  Bump to new version.\n" +
 	"\n\n"
 
