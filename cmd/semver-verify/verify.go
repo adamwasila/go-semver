@@ -8,7 +8,7 @@ import (
 	"github.com/adamwasila/go-semver"
 )
 
-var extraHelp string = "\n" +
+var extraHelp = "\n" +
 	"  Validate range of versions given in argument list.\n" +
 	"\n\n"
 

@@ -13,7 +13,7 @@ import (
 	"github.com/adamwasila/go-semver"
 )
 
-var extraHelp string = "\n" +
+var extraHelp = "\n" +
 	"  Reads list of versions from standard input and returns sorted list of versions\n" +
 	"  to standard output. Sorting uses rules defined by semver 2.0 specification." +
 	"  See semver.org for details.\n" +
