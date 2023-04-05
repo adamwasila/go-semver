@@ -135,8 +135,8 @@ func increment(n string) string {
 	return bigN.String()
 }
 
-// BumpMajor is major version increment
-func BumpMajor() BumpOption {
+// NextMajorVersion is major version increment
+func NextMajorVersion() BumpOption {
 	return func(s *Version) error {
 		s.Major = increment(s.Major)
 		s.Minor = "0"
@@ -146,8 +146,8 @@ func BumpMajor() BumpOption {
 	}
 }
 
-// BumpMinor is minor version increment
-func BumpMinor() BumpOption {
+// NextMinorVersion is minor version increment
+func NextMinorVersion() BumpOption {
 	return func(s *Version) error {
 		s.Minor = increment(s.Minor)
 		s.Patch = "0"
@@ -156,8 +156,8 @@ func BumpMinor() BumpOption {
 	}
 }
 
-// BumpPatch is patch version increment
-func BumpPatch() BumpOption {
+// NextPatchVersion is patch version increment
+func NextPatchVersion() BumpOption {
 	return func(s *Version) error {
 		s.Patch = increment(s.Patch)
 		s.Prerelease = []string{}
@@ -165,8 +165,8 @@ func BumpPatch() BumpOption {
 	}
 }
 
-// BumpRelease is increment to next non-prerelease version
-func BumpRelease() BumpOption {
+// NextReleaseVersion is increment to next non-prerelease version
+func NextReleaseVersion() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
 			return fmt.Errorf("no prerelease set in version")
@@ -177,7 +177,7 @@ func BumpRelease() BumpOption {
 }
 
 // BumpPrerelease is incrementing last numeric prerelease component
-func BumpPrelease() BumpOption {
+func NextPrereleaseVersion() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
 			return fmt.Errorf("no prerelease set in version")
@@ -200,7 +200,7 @@ func BumpPrelease() BumpOption {
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
 		options = []BumpOption{
-			BumpMajor(),
+			NextMajorVersion(),
 			BuildMetadata(""),
 		}
 	}
