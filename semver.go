@@ -168,11 +168,13 @@ func NextPatchVersion() BumpOption {
 	}
 }
 
+var ErrNoPrerelease = errors.New("no prerelease set in version")
+
 // NextReleaseVersion is increment to next non-prerelease version
 func NextReleaseVersion() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
-			return fmt.Errorf("no prerelease set in version")
+			return ErrNoPrerelease
 		}
 		v.Prerelease = []string{}
 		return nil
@@ -183,7 +185,7 @@ func NextReleaseVersion() BumpOption {
 func NextPrereleaseVersion() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
-			return fmt.Errorf("no prerelease set in version")
+			return ErrNoPrerelease
 		}
 		for i := len(v.Prerelease) - 1; i >= 0; i-- {
 			const baseDec = 10
