@@ -2,6 +2,7 @@
 package semver
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -125,43 +126,45 @@ func compose(opts ...func(*Version) error) func(*Version) error {
 // BumpOption is function option that changes version to newer
 type BumpOption func(*Version) error
 
-func increment(n string) string {
+var ErrCorruptedVersion = errors.New("corrupted version")
+
+func increment(n string) (string, error) {
 	const baseDec = 10
 	bigN, ok := big.NewInt(0).SetString(n, baseDec)
 	if !ok {
-		panic("incrementing corrupted version number")
+		return "", ErrCorruptedVersion
 	}
 	bigN.Add(bigN, big.NewInt(1))
-	return bigN.String()
+	return bigN.String(), nil
 }
 
 // NextMajorVersion is major version increment
 func NextMajorVersion() BumpOption {
-	return func(s *Version) error {
-		s.Major = increment(s.Major)
+	return func(s *Version) (err error) {
+		s.Major, err = increment(s.Major)
 		s.Minor = "0"
 		s.Patch = "0"
 		s.Prerelease = []string{}
-		return nil
+		return err
 	}
 }
 
 // NextMinorVersion is minor version increment
 func NextMinorVersion() BumpOption {
-	return func(s *Version) error {
-		s.Minor = increment(s.Minor)
+	return func(s *Version) (err error) {
+		s.Minor, err = increment(s.Minor)
 		s.Patch = "0"
 		s.Prerelease = []string{}
-		return nil
+		return err
 	}
 }
 
 // NextPatchVersion is patch version increment
 func NextPatchVersion() BumpOption {
-	return func(s *Version) error {
-		s.Patch = increment(s.Patch)
+	return func(s *Version) (err error) {
+		s.Patch, err = increment(s.Patch)
 		s.Prerelease = []string{}
-		return nil
+		return err
 	}
 }
 
