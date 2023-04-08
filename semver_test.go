@@ -359,7 +359,7 @@ func ExampleMustParse() {
 
 func ExampleVersion_Bump() {
 	sv := semver.MustParse("1.2.3-rc.1+cafebabe")
-	sv, _ = sv.Bump(semver.NextMajorVersion())
+	sv, _ = sv.Bump(semver.NextMajor())
 	fmt.Printf("%s", sv.String())
 	// Output:
 	// 2.0.0
@@ -430,28 +430,28 @@ func TestVersion_Bump(t *testing.T) {
 			result{expectedVersion: "2.0.0"},
 		},
 		{"with explicit option breaking change version bumps to next major version",
-			args{baseVersion: "1.2.3", options: opts{semver.NextMajorVersion()}},
+			args{baseVersion: "1.2.3", options: opts{semver.NextMajor()}},
 			result{expectedVersion: "2.0.0"},
 		},
 		{"with explicit option feature add version bumps to next minor version",
-			args{baseVersion: "1.2.3", options: opts{semver.NextMinorVersion()}},
+			args{baseVersion: "1.2.3", options: opts{semver.NextMinor()}},
 			result{expectedVersion: "1.3.0"},
 		},
 		{"with explicit option withbugfix/implementation change version bumps to next patch version",
-			args{baseVersion: "1.2.3", options: opts{semver.NextPatchVersion()}},
+			args{baseVersion: "1.2.3", options: opts{semver.NextPatch()}},
 			result{expectedVersion: "1.2.4"},
 		},
 		{"prerelease version bumps to next prerelease version if last component is number",
-			args{baseVersion: "1.2.3-rc.1", options: opts{semver.NextPrereleaseVersion()}}, result{expectedVersion: "1.2.3-rc.2"},
+			args{baseVersion: "1.2.3-rc.1", options: opts{semver.NextPrerelease()}}, result{expectedVersion: "1.2.3-rc.2"},
 		},
 		{"prerelease version bumps to next prerelease version looking for last component number",
-			args{baseVersion: "1.2.3-rc.1.doh", options: opts{semver.NextPrereleaseVersion()}}, result{expectedVersion: "1.2.3-rc.2.doh"},
+			args{baseVersion: "1.2.3-rc.1.doh", options: opts{semver.NextPrerelease()}}, result{expectedVersion: "1.2.3-rc.2.doh"},
 		},
 		{"prerelease version bumps to next prerelease version looking only for last component number",
-			args{baseVersion: "1.2.3-rc.1.1", options: opts{semver.NextPrereleaseVersion()}}, result{expectedVersion: "1.2.3-rc.1.2"},
+			args{baseVersion: "1.2.3-rc.1.1", options: opts{semver.NextPrerelease()}}, result{expectedVersion: "1.2.3-rc.1.2"},
 		},
 		{"prerelease version bumps to next prerelease even for very large numbers",
-			args{baseVersion: "1.2.3-rc.324762873462783468723468723", options: opts{semver.NextPrereleaseVersion()}},
+			args{baseVersion: "1.2.3-rc.324762873462783468723468723", options: opts{semver.NextPrerelease()}},
 			result{expectedVersion: "1.2.3-rc.324762873462783468723468724"},
 		},
 		{"by default version bumps and clears buildmetadata",
@@ -459,7 +459,7 @@ func TestVersion_Bump(t *testing.T) {
 			result{expectedVersion: "5.0.0"},
 		},
 		{"with explicit option bumps and sets buildmetadata",
-			args{baseVersion: "1.0.0+test", options: opts{semver.NextMajorVersion(), semver.BuildMetadata("other")}},
+			args{baseVersion: "1.0.0+test", options: opts{semver.NextMajor(), semver.BuildMetadata("other")}},
 			result{expectedVersion: "2.0.0+other"},
 		},
 	}

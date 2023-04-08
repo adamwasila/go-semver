@@ -60,7 +60,7 @@ Bump version:
 
 ```go
 sv := semver.MustParse("1.2.3-rc.1+cafebabe")
-sv, _ = sv.Bump(semver.BumpMajor())
+sv, _ = sv.Bump(semver.NextMajor())
 fmt.Printf("%s", sv.String())
 ```
 

@@ -138,8 +138,8 @@ func increment(n string) (string, error) {
 	return bigN.String(), nil
 }
 
-// NextMajorVersion is major version increment
-func NextMajorVersion() BumpOption {
+// NextMajor is major version increment
+func NextMajor() BumpOption {
 	return func(s *Version) (err error) {
 		s.Major, err = increment(s.Major)
 		s.Minor = "0"
@@ -149,8 +149,8 @@ func NextMajorVersion() BumpOption {
 	}
 }
 
-// NextMinorVersion is minor version increment
-func NextMinorVersion() BumpOption {
+// NextMinor is minor version increment
+func NextMinor() BumpOption {
 	return func(s *Version) (err error) {
 		s.Minor, err = increment(s.Minor)
 		s.Patch = "0"
@@ -159,8 +159,8 @@ func NextMinorVersion() BumpOption {
 	}
 }
 
-// NextPatchVersion is patch version increment
-func NextPatchVersion() BumpOption {
+// NextPatch is patch version increment
+func NextPatch() BumpOption {
 	return func(s *Version) (err error) {
 		s.Patch, err = increment(s.Patch)
 		s.Prerelease = []string{}
@@ -170,8 +170,8 @@ func NextPatchVersion() BumpOption {
 
 var ErrNoPrerelease = errors.New("no prerelease set in version")
 
-// NextReleaseVersion is increment to next non-prerelease version
-func NextReleaseVersion() BumpOption {
+// NextRelease is increment to next non-prerelease version
+func NextRelease() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
 			return ErrNoPrerelease
@@ -181,8 +181,8 @@ func NextReleaseVersion() BumpOption {
 	}
 }
 
-// BumpPrerelease is incrementing last numeric prerelease component
-func NextPrereleaseVersion() BumpOption {
+// NextPrerelease is incrementing last numeric prerelease component
+func NextPrerelease() BumpOption {
 	return func(v *Version) error {
 		if len(v.Prerelease) == 0 {
 			return ErrNoPrerelease
@@ -205,7 +205,7 @@ func NextPrereleaseVersion() BumpOption {
 func (semver *Version) Bump(options ...BumpOption) (Version, error) {
 	if len(options) == 0 {
 		options = []BumpOption{
-			NextMajorVersion(),
+			NextMajor(),
 			BuildMetadata(""),
 		}
 	}
